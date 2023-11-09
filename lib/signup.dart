@@ -18,176 +18,190 @@ class _SignUpState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      backgroundColor: Color(0xFF08d6cb),
+
+      body: Align(
+        alignment: Alignment.bottomCenter,
+
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(height: 200,),
-                Text(
-                  'Welcome! \n\nEnter your Details to Sign-up',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22,
+            padding: const EdgeInsets.fromLTRB(0.0,20,0,0),
+
+
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(30),
+                  )
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 100,),
+                  Text(
+                    'Welcome! \n\nEnter your Details to Sign-up',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
                   ),
-                ),
-                SizedBox(height: 20),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      SizedBox(height: 10),
-                      Container(
-                        width: 300,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 0.50,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            style: TextStyle(fontSize: 16),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter your E-mail ID here';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: ' Email',
+                  SizedBox(height: 20),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10),
+                        Container(
+                          width: 300,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 0.50,
                             ),
                           ),
-                        ),
-                      ),
-
-                      SizedBox(height: 10),
-
-                      Container(
-                        width: 300,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 0.50,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            controller: _passwordController,
-                            keyboardType: TextInputType.visiblePassword,
-                            style: TextStyle(fontSize: 16),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter your password here';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: ' Create password ',
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 10),
-
-                      Container(
-                        width: 300,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 0.50,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TextFormField(
-                            controller: _reenterPasswordController,
-                            keyboardType: TextInputType.visiblePassword,
-                            style: TextStyle(fontSize: 16),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please re-enter your password here';
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: ' Re-enter your new password ',
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 150),
-                      Container(
-                        width: 120,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xff36e869), Color(0xFF08d6cb)],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _register();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.transparent,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Container(
-                            alignment: Alignment.center,
-                            height: 50,
-                            width: 200,
-                            child: Text(
-                              'SIGN-UP',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              style: TextStyle(fontSize: 16),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter your E-mail ID here';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: ' Email',
                               ),
                             ),
                           ),
                         ),
-                      ),
 
-                      SizedBox(height: 10),
+                        SizedBox(height: 10),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Already have an account!"),
-                          TextButton(onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
-                          }, child: Text("Log-in"),
+                        Container(
+                          width: 300,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 0.50,
+                            ),
                           ),
-                        ],
-                      )
-                    ],
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              controller: _passwordController,
+                              keyboardType: TextInputType.visiblePassword,
+                              style: TextStyle(fontSize: 16),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter your password here';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: ' Create password ',
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 10),
+
+                        Container(
+                          width: 300,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 0.50,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              controller: _reenterPasswordController,
+                              keyboardType: TextInputType.visiblePassword,
+                              style: TextStyle(fontSize: 16),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please re-enter your password here';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: ' Re-enter your new password ',
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 150),
+                        Container(
+                          width: 120,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xff36e869), Color(0xFF08d6cb)],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _register();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.transparent,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 50,
+                              width: 200,
+                              child: Text(
+                                'SIGN-UP',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 10),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Already have an account!"),
+                            TextButton(onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+                            }, child: Text("Log-in"),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
