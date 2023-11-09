@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:edu_kit_hariom/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'edit_profile.dart';
 
@@ -70,7 +71,8 @@ class _ProfileState extends State<Profile> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditProfile(userName: widget.userName),
+                    builder: (context) =>
+                        EditProfile(userName: widget.userName),
                   ),
                 );
               },
@@ -83,7 +85,16 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  void _logout(BuildContext context) {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Login()));
+  // Function to perform logout
+  void _logout(BuildContext context) async {
+    // Clear user data from SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('email'); // Remove the email
+    await prefs.remove('password_${widget.userName}'); // Remove the password
+    await prefs.remove('name_${widget.userName}'); // Remove the username
+
+    // Navigate back to the login page
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => Login()));
   }
 }
