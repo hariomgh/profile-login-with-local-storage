@@ -12,6 +12,7 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _emailController = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _reenterPasswordController = TextEditingController();
 
@@ -25,7 +26,7 @@ class _SignUpState extends State<SignUp> {
 
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(0.0,20,0,0),
+            padding: const EdgeInsets.fromLTRB(0.0, 20, 0, 0),
 
 
             child: Container(
@@ -97,6 +98,39 @@ class _SignUpState extends State<SignUp> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
+                              controller: _nameController,
+                              keyboardType: TextInputType.name,
+                              style: TextStyle(fontSize: 16),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter your name here';
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: ' name',
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        SizedBox(height: 10),
+
+                        Container(
+                          width: 300,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 0.50,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              obscureText: true,
                               controller: _passwordController,
                               keyboardType: TextInputType.visiblePassword,
                               style: TextStyle(fontSize: 16),
@@ -129,12 +163,16 @@ class _SignUpState extends State<SignUp> {
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: TextFormField(
+                              obscureText: true,
                               controller: _reenterPasswordController,
                               keyboardType: TextInputType.visiblePassword,
                               style: TextStyle(fontSize: 16),
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   return 'Please re-enter your password here';
+                                }
+                                if (value != _passwordController.text) {
+                                  return 'Passwords do not match';
                                 }
                                 return null;
                               },
@@ -192,7 +230,9 @@ class _SignUpState extends State<SignUp> {
                           children: [
                             const Text("Already have an account!"),
                             TextButton(onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+                              Navigator.pushReplacement(context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Login()));
                             }, child: Text("Log-in"),
                             ),
                           ],
@@ -208,18 +248,22 @@ class _SignUpState extends State<SignUp> {
       ),
     );
   }
-
   void _register() async {
     if (_formKey.currentState!.validate()) {
       final email = _emailController.text;
+      final name = _nameController.text;
       final password = _passwordController.text;
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('email', email);
       await prefs.setString('password_$email', password);
+      await prefs.setString('name_$email', name);
 
-
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Login()),
+      );
     }
   }
+
 }

@@ -1,5 +1,8 @@
+import 'package:edu_kit_hariom/profile.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'model.dart';
 
 class EditProfile extends StatefulWidget {
   final String userName;
@@ -11,7 +14,57 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  String updatedName = 'Test Name';
+  String updatedName = '';
+  String updatedBio = '';
+  String updatedPincode = '';
+  bool isLoading = false;
+  late String editedUserName; // Mutable variable to store the updated user name
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    editedUserName = widget.userName; // Initialize the mutable variable with the initial user name
+
+    // Retrieve previously saved bio and pin
+    _loadBioAndPin();
+  }
+
+  Future<void> _loadBioAndPin() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      updatedBio = prefs.getString('bio_${widget.userName}') ?? '';
+      updatedPincode = prefs.getString('pin_${widget.userName}') ?? '';
+    });
+  }
+
+  Future<void> _updateProfile() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        isLoading = true;
+      });
+
+      await Future.delayed(Duration(seconds: 1));
+
+      setState(() {
+        isLoading = false;
+        editedUserName = updatedName; // Update the mutable variable with the new user name
+      });
+
+      // Save the updated username to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('name_${widget.userName}', editedUserName);
+
+      // Save the updated bio and pin to SharedPreferences
+      prefs.setString('bio_${widget.userName}', updatedBio);
+      prefs.setString('pin_${widget.userName}', updatedPincode);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile updated')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,55 +74,108 @@ class _EditProfileState extends State<EditProfile> {
         title: Text('Edit Profile'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 80,
-              backgroundColor: Colors.grey,
-              child: CachedNetworkImage(
-                imageUrl: 'https://images.unsplash.com/photo-1554151228-14d9def656e4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=333&q=80',
-                placeholder: (context, url) => CircularProgressIndicator(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Stack(
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: 80,
+                    backgroundImage: AssetImage("assets/images/img.png"),
+                  ),
+                ],
               ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Edit Name:',
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-            SizedBox(height: 10),
-            Container(
-              width: 200,
-              child: TextFormField(
-                initialValue: updatedName,
-                decoration: InputDecoration(
-                  labelText: 'Name',
-                  border: OutlineInputBorder(),
+              SizedBox(height: 20),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Text(
+                      'Edit Name:',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      width: 300,
+                      child: TextFormField(
+                        initialValue: widget.userName,
+                        decoration: InputDecoration(
+                          labelText: 'Name',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            updatedName = value;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Bio',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      width: 300,
+                      child: TextFormField(
+                        initialValue: updatedBio,
+                        decoration: InputDecoration(
+                          labelText: 'Bio',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            updatedBio = value;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Edit Pincode:',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Container(
+                      width: 300,
+                      child: TextFormField(
+                        initialValue: updatedPincode,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        decoration: InputDecoration(
+                          labelText: 'Pincode',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            updatedPincode = value;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: isLoading ? null : () async {
+                        await _updateProfile();
+                        Navigator.pop(context, PincodeData(name: editedUserName, description: updatedPincode, bio: updatedBio));
+                      },
+                      child: Text('Save Changes'),
+                    )
+                  ],
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    updatedName = value;
-                  });
-                },
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Profile updated')),
-                );
-
-                // Navigate back to the Profile page
-                Navigator.pop(context);
-              },
-              child: Text('Save Changes'),
-            )
-
-          ],
+            ],
+          ),
         ),
       ),
     );

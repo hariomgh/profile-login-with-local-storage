@@ -1,20 +1,53 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:edu_kit_hariom/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'edit_profile.dart';
+import 'model.dart';
 
 class Profile extends StatefulWidget {
   final String userName;
+  final String userEmail;
+  final String? userBio;
+  final String? userPin;
 
-  const Profile({Key? key, required this.userName}) : super(key: key);
+  const Profile(
+      {Key? key,
+        required this.userName,
+        required this.userEmail,
+        this.userBio,
+        this.userPin})
+      : super(key: key);
 
   @override
   State<Profile> createState() => _ProfileState();
 }
 
 class _ProfileState extends State<Profile> {
+  late PincodeData pincodeData = PincodeData(name: '', description: '', bio: '');
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPincodeData('110001');
+  }
+
+  Future<void> fetchPincodeData(String postalCode) async {
+    try {
+      final data = await fetchPincode(postalCode);
+      if (data != null) {
+        setState(() {
+          pincodeData = data;
+        });
+      }
+    } catch (e) {
+      print('Failed to fetch PIN code: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,69 +65,102 @@ class _ProfileState extends State<Profile> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Welcome, ${widget.userName}!',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-            ),
-            SizedBox(height: 20),
-            CircleAvatar(
-              radius: 80,
-              backgroundColor: Colors.grey,
-              child: CachedNetworkImage(
-                imageUrl:
-                'https://images.unsplash.com/photo-1554151228-14d9def656e4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=333&q=80',
-                placeholder: (context, url) => CircularProgressIndicator(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Test Name',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10),
-            Text(
-              widget.userName,
-              style: TextStyle(fontSize: 16),
-            ),
+            Container(
 
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        EditProfile(userName: widget.userName),
+              child: CircleAvatar(
+                radius: 80,
+                backgroundImage: AssetImage("assets/images/img.png"),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+
+                  SizedBox(height: 20),
+                  Text(
+                    'Welcome, ${widget.userName}!',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22,
+                    ),
                   ),
-                );
-              },
-              child: Text('Edit profile'),
-            )
+                  SizedBox(height: 10),
+                  Text(
+                    'Emails: ${widget.userEmail}',
+                    style: TextStyle(
 
+                    ),
+                  ),
+
+                  SizedBox(height: 10),
+                  Text('PIN Code: ${pincodeData.description}'),
+                  SizedBox(height: 10),
+                  Text('Bio: ${pincodeData.bio}'),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final updatedPincodeData = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              EditProfile(userName: widget.userName),
+                        ),
+                      );
+                      if (updatedPincodeData != null) {
+                        setState(() {
+                          pincodeData = updatedPincodeData;
+                        });
+                      }
+                    },
+                    child: Text('Edit Profile'),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Function to perform logout
   void _logout(BuildContext context) async {
-    // Clear user data from SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('email'); // Remove the email
-    await prefs.remove('password_${widget.userName}'); // Remove the password
-    await prefs.remove('name_${widget.userName}'); // Remove the username
+    prefs.setBool('isLoggedIn', false);
+    await prefs.remove('email');
+    await prefs.remove('password_${widget.userName}');
+    await prefs.remove('name_${widget.userName}');
 
-    // Navigate back to the login page
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => Login()));
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => Login()));
+  }
+}
+
+class PincodeData {
+  final String name;
+  final String description;
+  final String bio;
+
+  PincodeData(
+      {required this.name, required this.description, required this.bio});
+}
+
+Future<PincodeData> fetchPincode(String postalCode) async {
+  final url = 'http://www.postalpincode.in/api/pincode/$postalCode';
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    final postOffice = data[0]['PostOffice'][0];
+    final name = postOffice['Name'];
+    final description = postOffice['Description'];
+    final bio = postOffice['Bio'];
+
+    return PincodeData(name: name, description: description, bio: bio);
+  } else {
+    throw Exception('Failed to fetch PIN code');
   }
 }

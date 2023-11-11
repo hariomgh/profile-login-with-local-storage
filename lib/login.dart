@@ -176,36 +176,39 @@ class _LoginState extends State<Login> {
     );
   }
 
-  // Function to perform login
-//   void _login() async {
-//     if (_formKey.currentState!.validate()) {
-//       final email = _emailController.text;
-//       final password = _passwordController.text;
-//
-//       final prefs = await SharedPreferences.getInstance();
-//       final storedPassword = prefs.getString('password_$email');
-//
-//       if (storedPassword == password) {
-//         String? userName = await prefs.getString('name_$email');
-//         if (userName != null) {
-//           Navigator.push(context, MaterialPageRoute(builder: (context) => Profile(userName: userName)));
-//         }
-//       } else {
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             content: Text('Login failed. Please check your credentials.'),
-//           ),
-//         );
-//       }
-//     }
-//   }
-// }
 
-// Function to perform login
-  void _login() {
-    final email = _emailController.text;
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => Profile(userName: email)),
-    );
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      final email = _emailController.text;
+      final password = _passwordController.text;
+
+      final prefs = await SharedPreferences.getInstance();
+      final storedPassword = prefs.getString('password_$email');
+
+      if (storedPassword == password) {
+        String? userName = await prefs.getString('name_$email');
+        String? userEmail = await prefs.getString('email');
+
+        if (userName != null && userEmail != null) {
+          // Set a flag indicating the user is logged in
+          prefs.setBool('isLoggedIn', true);
+
+          prefs.setString('loggedInUserEmail', userEmail);
+          prefs.setString('loggedInUserName', userName);
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Profile(userName: userName, userEmail: userEmail)),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed. Please check your credentials.'),
+          ),
+        );
+      }
+    }
   }
+
 }
